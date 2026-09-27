@@ -1,4 +1,4 @@
-# Filter-Bot
+# FILTER-BOT
 
 - A lightweight userbot that continuously
   - monitors Telegram channels using GramJS (MTProto),

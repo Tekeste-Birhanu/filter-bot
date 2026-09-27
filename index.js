@@ -1,4 +1,6 @@
 import { config } from "./src/config.js";
+import { loadState, getState } from "./src/storage.js";
+import { initTelegramClient } from "./src/telegram.js";
 
 async function main() {
   console.log("==========================================");
@@ -9,7 +11,21 @@ async function main() {
   console.log(`[Config] Gemini Model: ${config.gemini.model}`);
   console.log(`[Config] Session Storage: ${config.telegram.sessionFilePath}`);
   console.log(`[Config] Channels Store: ${config.storage.channelsFilePath}`);
-  console.log("Environment configuration validated successfully.");
+  console.log("Environment configuration validated successfully.\n");
+
+  // Initialize and load persistent JSON state (Module 2)
+  console.log("[State] Initializing persistent storage...");
+  const state = await loadState();
+  console.log(`[State] Watched Channels: [${state.watchedChannels.join(", ")}]`);
+  console.log(`[State] Destination Channel: ${state.destChannel || "(none set)"}`);
+  console.log(`[State] Filter Prompt: ${state.prompt ? `"${state.prompt}"` : "(none set)"}\n`);
+
+  // Initialize GramJS MTProto client & session persistence (Module 2)
+  console.log("[Telegram] Connecting to Telegram MTProto...");
+  const client = await initTelegramClient();
+  console.log("[Telegram] MTProto connection established and authenticated.\n");
+
+  console.log("Module 2 (GramJS Login & Persistent State) initialized successfully.");
 }
 
 main().catch((err) => {

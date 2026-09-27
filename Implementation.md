@@ -20,7 +20,17 @@
 
 **Sub-features:**
 
-- (to be filled in after completion)
+- Persistent State Management (`src/storage.js`):
+  - Created JSON data store (`channels.json`) to persist watchlist, destination channel, and Gemini prompt,
+  - Implemented automatic directory and file creation on first run with graceful error handling,
+  - Added helper functions (`loadState`, `saveState`, `addChannel`, `removeChannel`, `setPrompt`, `setDestChannel`),
+  - Added username and channel identifier normalization (stripping leading `@` and lowercase conversion).
+- GramJS Client & Session Persistence (`src/telegram.js`):
+  - Created Telegram MTProto client initialization with `TelegramClient` and `StringSession`,
+  - Implemented interactive console authentication for phone number, SMS verification code, and 2FA password,
+  - Added persistent session storage to disk (`.session`), enabling zero-prompt instant re-authentication on subsequent startups,
+  - Verified user authentication by logging authenticated user profile information (`id`, `username`, `firstName`),
+  - Integrated persistent state and client initialization into `index.js`.
 
 ## 3. Channel Listener
 
