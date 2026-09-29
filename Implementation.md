@@ -38,7 +38,12 @@
 
 **Sub-features:**
 
-- (to be filled in after completion)
+- Added `src/channelListener.js` with a GramJS `NewMessage` event listener for posts in the persisted watchlist.
+- Resolved saved channel usernames/IDs to Telegram entities and filtered incoming updates by channel ID.
+- Prepared text posts as a normalized callback payload containing channel, channel ID, message ID, text, date, and original GramJS message for Module 4.
+- Skipped media-only posts with no text and isolated callback errors so one failed post does not stop the listener.
+- Added `syncWatchedChannels()` for reloading subscriptions after runtime watchlist changes and `stopChannelListener()` for clean shutdown.
+- Started the listener from `index.js`; the current handoff logs each prepared post until Module 4 supplies its filtering callback.
 
 ## 4. LLM Filter & Forward
 

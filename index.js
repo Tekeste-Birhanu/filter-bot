@@ -1,6 +1,7 @@
 import { config } from "./src/config.js";
-import { loadState, getState } from "./src/storage.js";
+import { loadState } from "./src/storage.js";
 import { initTelegramClient } from "./src/telegram.js";
+import { startChannelListener } from "./src/channelListener.js";
 
 async function main() {
   console.log("==========================================");
@@ -25,7 +26,14 @@ async function main() {
   const client = await initTelegramClient();
   console.log("[Telegram] MTProto connection established and authenticated.\n");
 
-  console.log("Module 2 (GramJS Login & Persistent State) initialized successfully.");
+  await startChannelListener(client, {
+    onPost: async (post) => {
+      console.log(`[Listener] New post from @${post.channel} (message ${post.messageId})`);
+      // Module 4 will consume this prepared post object for LLM filtering.
+    },
+  });
+
+  console.log("Module 3 (Channel Listener) initialized successfully.");
 }
 
 main().catch((err) => {
