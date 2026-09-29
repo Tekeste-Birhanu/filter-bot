@@ -1,6 +1,7 @@
 import { NewMessage } from "telegram/events/index.js";
 import { getPeerId as getMarkedPeerId } from "telegram/Utils.js";
 import { getWatchedChannels } from "./storage.js";
+import { withTransientRetries } from "./retry.js";
 
 let activeListener = null;
 
@@ -26,6 +27,7 @@ export async function startChannelListener(client, { onPost = () => {} } = {}) {
     event: new NewMessage({}),
     channelsByPeerId: new Map(),
     channelsByUsername: new Map(),
+    sourceByUsername: new Map(),
   };
 
   listener.handler = async (event) => {
@@ -66,20 +68,33 @@ export async function syncWatchedChannels() {
   const wanted = await getWatchedChannels();
   const nextByPeerId = new Map();
   const nextByUsername = new Map();
+  const nextSourceByUsername = new Map();
   const added = [];
   const removed = [];
 
   for (const channel of wanted) {
     try {
-      const entity = await listener.client.getEntity(channel);
+      const entity = await withTransientRetries(
+        () => listener.client.getEntity(channel),
+        { label: `Telegram channel lookup (${channel})`, retries: 2 },
+      );
       const peerId = getMarkedPeerId(entity);
       if (!peerId) throw new Error("Telegram did not return a channel ID.");
       const username = entity.username?.toLowerCase() || channel;
       nextByPeerId.set(peerId, username);
       nextByUsername.set(username, peerId);
+      nextSourceByUsername.set(username, channel);
       if (!listener.channelsByUsername.has(username)) added.push(username);
     } catch (error) {
       console.error(`[Listener] Could not resolve '${channel}': ${error.message}`);
+      const previousUsername = [...listener.sourceByUsername.entries()]
+        .find(([, source]) => source === channel)?.[0];
+      const previousPeerId = previousUsername && listener.channelsByUsername.get(previousUsername);
+      if (previousUsername && previousPeerId) {
+        nextByPeerId.set(previousPeerId, previousUsername);
+        nextByUsername.set(previousUsername, previousPeerId);
+        nextSourceByUsername.set(previousUsername, channel);
+      }
     }
   }
 
@@ -89,6 +104,7 @@ export async function syncWatchedChannels() {
 
   listener.channelsByPeerId = nextByPeerId;
   listener.channelsByUsername = nextByUsername;
+  listener.sourceByUsername = nextSourceByUsername;
   if (added.length || removed.length) {
     console.log(`[Listener] Watchlist synced (${nextByPeerId.size} channel(s)).`);
   }

@@ -4,6 +4,7 @@ import { disconnectTelegramClient, initTelegramClient } from "./src/telegram.js"
 import { startChannelListener, stopChannelListener } from "./src/channelListener.js";
 import { filterAndForwardPost } from "./src/filterForward.js";
 import { startManagementBot, stopManagementBot } from "./src/managementBot.js";
+import { createPostQueue } from "./src/postQueue.js";
 
 async function main() {
   console.log("==========================================");
@@ -28,9 +29,8 @@ async function main() {
   const client = await initTelegramClient();
   console.log("[Telegram] MTProto connection established and authenticated.\n");
 
-  await startChannelListener(client, {
-    onPost: (post) => filterAndForwardPost(client, post),
-  });
+  const postQueue = createPostQueue((post) => filterAndForwardPost(client, post));
+  await startChannelListener(client, { onPost: (post) => postQueue.enqueue(post) });
 
   const managementBot = startManagementBot(client);
   let shuttingDown = false;
@@ -50,7 +50,7 @@ async function main() {
   process.once("SIGINT", shutdown);
   process.once("SIGTERM", shutdown);
 
-  console.log("Modules 3 (Channel Listener), 4 (LLM Filter & Forward), and 5 (Bot Commands & Management) initialized successfully.");
+  console.log("Modules 3 (Channel Listener), 4 (LLM Filter & Forward), 5 (Bot Commands), and 6 (Resilience & Concurrency) initialized successfully.");
 }
 
 main().catch((err) => {

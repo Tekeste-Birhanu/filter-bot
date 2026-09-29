@@ -68,6 +68,9 @@ export async function initTelegramClient() {
     config.telegram.apiHash,
     {
       connectionRetries: 5,
+      reconnectRetries: Infinity,
+      retryDelay: 1000,
+      autoReconnect: true,
     }
   );
 

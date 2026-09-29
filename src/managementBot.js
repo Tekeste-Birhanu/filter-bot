@@ -142,6 +142,8 @@ export function startManagementBot(client) {
   });
 
   pollingTask = run(bot, {
+    retry: true,
+    retryDelayMs: 1000,
     onError: (error) => console.error("[Management Bot] Polling error:", error.message || error),
   });
   console.log("[Management Bot] Started polling for owner commands.");

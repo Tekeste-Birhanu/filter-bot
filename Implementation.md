@@ -76,7 +76,12 @@
 
 **Sub-features:**
 
-- (to be filled in after completion)
+- Made GramJS automatic reconnect behavior explicit with unlimited reconnect attempts and a one-second retry delay after initial authentication.
+- Enabled long-poll retry for the management bot, with transient polling errors logged and retried by the installed Bot API v2 runner.
+- Added `src/retry.js` with capped exponential backoff for transient network, rate-limit, and server errors during Gemini classification and Telegram forwarding.
+- Retried Telegram channel lookups during watchlist synchronization and retained existing listener mappings when a temporary lookup failure occurs.
+- Added `src/postQueue.js` to cap concurrent post handling at three jobs, deduplicate in-flight and recently completed updates, and bound pending work to 500 posts.
+- Wired the queue into the listener handoff; failures are isolated per post, and a full queue logs dropped updates instead of growing without bound.
 
 ## 7. End-to-End Integration Pass
 
