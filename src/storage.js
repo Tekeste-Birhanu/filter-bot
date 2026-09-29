@@ -155,6 +155,27 @@ export async function addChannel(channel) {
   };
 }
 
+/** Adds multiple normalized channels and persists the updated watchlist once. */
+export async function addChannels(channels) {
+  const state = await getState();
+  const unique = [...new Set((Array.isArray(channels) ? channels : []).map(normalizeChannel).filter(Boolean))];
+  const results = [];
+  let changed = false;
+
+  for (const channel of unique) {
+    if (state.watchedChannels.includes(channel)) {
+      results.push({ channel, success: false, reason: "already_watched" });
+      continue;
+    }
+    state.watchedChannels.push(channel);
+    results.push({ channel, success: true });
+    changed = true;
+  }
+
+  if (changed) await saveState(state);
+  return results;
+}
+
 /**
  * Removes a channel from the watchlist.
  *

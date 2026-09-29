@@ -118,7 +118,7 @@ Message your bot in Telegram to control your watch list in real time:
 | /prompt "your prompt here"  | Set which messages to filter             |
 | /settings                   | Show the saved prompt and destination     |
 | /listchannels               | View all monitored channels              |
-| /addchannel @username       | Add a channel to the watchlist           |
+| /addchannel @one @two       | Add up to 20 channels to the watchlist   |
 | /destchannel @username      | Set where matching messages are forwarded|
 | /removechannel @username    | Remove a channel from the watchlist      |
 ```

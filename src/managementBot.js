@@ -2,7 +2,7 @@ import { Bot } from "node-telegram-bot-api";
 import { run } from "node-telegram-bot-api/node";
 import { config } from "./config.js";
 import {
-  addChannel,
+  addChannels,
   getDestChannel,
   getPrompt,
   getWatchedChannels,
@@ -15,7 +15,7 @@ import { syncWatchedChannels } from "./channelListener.js";
 
 const HELP = [
   "Available commands:",
-  "/addchannel @username - add a channel to watch",
+  "/addchannel @channel1 @channel2 ... - add up to 20 channels",
   "/removechannel @username - remove a watched channel",
   "/listchannels - show the current watchlist",
   "/prompt your filter instructions - set the Gemini filter prompt",
@@ -74,14 +74,32 @@ export function startManagementBot(client) {
           break;
 
         case "addchannel": {
-          const channel = cleanChannelInput(argument);
-          if (!channel) return await reply("Usage: /addchannel @username");
-          await resolveChannel(client, channel, { requireBroadcast: true });
-          const result = await addChannel(channel);
-          if (result.success) {
-            await syncWatchedChannels();
+          const channels = [...new Set(argument.split(/[\s,]+/).map(cleanChannelInput).filter(Boolean))];
+          if (!channels.length) return await reply("Usage: /addchannel @channel1 @channel2");
+          if (channels.length > 20) return await reply("Add up to 20 channels per command.");
+
+          const valid = [];
+          const failures = [];
+          for (const channel of channels) {
+            try {
+              await resolveChannel(client, channel, { requireBroadcast: true });
+              valid.push(channel);
+            } catch (error) {
+              failures.push(`- @${channel}: ${error.message.slice(0, 160)}`);
+            }
           }
-          await reply(result.message);
+
+          const results = await addChannels(valid);
+          const added = results.filter((result) => result.success).map((result) => `- @${result.channel}`);
+          const duplicates = results.filter((result) => !result.success).map((result) => `- @${result.channel}: already watched`);
+          if (added.length) await syncWatchedChannels();
+
+          const lines = [
+            added.length ? `Added (${added.length}):\n${added.join("\n")}` : "No channels added.",
+            duplicates.length ? `Already watched:\n${duplicates.join("\n")}` : "",
+            failures.length ? `Could not add:\n${failures.join("\n")}` : "",
+          ].filter(Boolean);
+          await reply(lines.join("\n\n"));
           break;
         }
 
