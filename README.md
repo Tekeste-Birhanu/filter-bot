@@ -112,14 +112,18 @@ node index.js
 Message your bot in Telegram to control your watch list in real time:
 
 ```
-| Command                    | Description                           |
-| -------------------------- | ------------------------------------- |
-| /prompt "your prompt here" | Write which messages to filter        |
-| /listchannels              | View all monitored channels           |
-| /addchannel @username      | Add a channel to the watchlist        |
-| /destchannel @username     | Where to forward filtered messages    |
-| /removechannel @username   | Remove a channel from the watchlist   |
+| Command                     | Description                              |
+| --------------------------- | ---------------------------------------- |
+| /help                       | Show available commands                  |
+| /prompt "your prompt here"  | Set which messages to filter             |
+| /settings                   | Show the saved prompt and destination     |
+| /listchannels               | View all monitored channels              |
+| /addchannel @username       | Add a channel to the watchlist           |
+| /destchannel @username      | Set where matching messages are forwarded|
+| /removechannel @username    | Remove a channel from the watchlist      |
 ```
+
+Commands are accepted in a private chat with your management bot from the account whose numeric ID is set in `ALLOWED_USER_ID`.
 
 > Relief for someone who is looking for a job (😂). You don't have to read 400+ messages just to find all of them are for accountants while you're searching for junior React dev roles.
 

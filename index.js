@@ -1,8 +1,9 @@
 import { config } from "./src/config.js";
 import { loadState } from "./src/storage.js";
-import { initTelegramClient } from "./src/telegram.js";
-import { startChannelListener } from "./src/channelListener.js";
+import { disconnectTelegramClient, initTelegramClient } from "./src/telegram.js";
+import { startChannelListener, stopChannelListener } from "./src/channelListener.js";
 import { filterAndForwardPost } from "./src/filterForward.js";
+import { startManagementBot, stopManagementBot } from "./src/managementBot.js";
 
 async function main() {
   console.log("==========================================");
@@ -31,7 +32,25 @@ async function main() {
     onPost: (post) => filterAndForwardPost(client, post),
   });
 
-  console.log("Modules 3 (Channel Listener) and 4 (LLM Filter & Forward) initialized successfully.");
+  const managementBot = startManagementBot(client);
+  let shuttingDown = false;
+  const shutdown = async () => {
+    if (shuttingDown) return;
+    shuttingDown = true;
+    console.log("\n[Shutdown] Stopping Telegram clients...");
+    try {
+      await stopManagementBot(managementBot);
+    } catch (error) {
+      console.error("[Shutdown] Could not stop management bot cleanly:", error.message);
+    }
+    await stopChannelListener();
+    await disconnectTelegramClient();
+    process.exit(0);
+  };
+  process.once("SIGINT", shutdown);
+  process.once("SIGTERM", shutdown);
+
+  console.log("Modules 3 (Channel Listener), 4 (LLM Filter & Forward), and 5 (Bot Commands & Management) initialized successfully.");
 }
 
 main().catch((err) => {

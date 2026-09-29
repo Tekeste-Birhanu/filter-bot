@@ -63,7 +63,12 @@
 
 **Sub-features:**
 
-- (to be filled in after completion)
+- Added `src/managementBot.js` using the Telegram Bot API polling client to handle owner commands in private chat only.
+- Restricted command handling to the numeric `ALLOWED_USER_ID`; messages from other accounts and group chats are ignored.
+- Implemented `/help`, `/addchannel`, `/removechannel`, `/listchannels`, `/prompt`, `/destchannel`, and `/settings` commands.
+- Validated watched channels with the authenticated MTProto account before saving; watchlist changes immediately call `syncWatchedChannels()`.
+- Persisted prompt and destination changes using the existing JSON storage helpers, with input checks and command-specific error replies.
+- Started the management bot from `index.js` and added graceful shutdown for both Telegram clients.
 
 ## 6. Resilience & Multi-Channel Concurrency
 
