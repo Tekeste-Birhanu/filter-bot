@@ -2,6 +2,7 @@ import { config } from "./src/config.js";
 import { loadState } from "./src/storage.js";
 import { initTelegramClient } from "./src/telegram.js";
 import { startChannelListener } from "./src/channelListener.js";
+import { filterAndForwardPost } from "./src/filterForward.js";
 
 async function main() {
   console.log("==========================================");
@@ -27,13 +28,10 @@ async function main() {
   console.log("[Telegram] MTProto connection established and authenticated.\n");
 
   await startChannelListener(client, {
-    onPost: async (post) => {
-      console.log(`[Listener] New post from @${post.channel} (message ${post.messageId})`);
-      // Module 4 will consume this prepared post object for LLM filtering.
-    },
+    onPost: (post) => filterAndForwardPost(client, post),
   });
 
-  console.log("Module 3 (Channel Listener) initialized successfully.");
+  console.log("Modules 3 (Channel Listener) and 4 (LLM Filter & Forward) initialized successfully.");
 }
 
 main().catch((err) => {

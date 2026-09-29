@@ -51,7 +51,11 @@
 
 **Sub-features:**
 
-- (to be filled in after completion)
+- Added `src/filterForward.js` using the Google Gen AI SDK and configured Gemini model to classify each prepared post against the saved prompt.
+- Asked Gemini for a strict `YES`/`NO` decision, treated post text as untrusted input, and rejected unexpected responses safely.
+- Forwarded matching original Telegram posts through the authenticated GramJS user session to the configured destination.
+- Added clear skip paths for a missing API key, prompt, or destination; missing API keys no longer prevent the app from starting.
+- Connected the Module 3 post callback to the filter-and-forward pipeline from `index.js`.
 
 ## 5. Bot Commands & Management
 

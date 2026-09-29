@@ -73,9 +73,6 @@ export async function initTelegramClient() {
 
   await telegramClient.start({
     phoneNumber: async () => {
-      if (config.telegram.phoneNumber) {
-        return config.telegram.phoneNumber;
-      }
       return await input.text("Enter your Telegram phone number (e.g. +251...): ");
     },
     password: async () => {

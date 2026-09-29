@@ -40,6 +40,7 @@
    - Copy your Numeric `user_id`
 4. **Google Gemini API Key**:
    - Generate a free API key at [Google AI Studio](https://aistudio.google.com/app/apikey).
+   - Filtering is skipped while `GEMINI_API_KEY` is unset; you can add it to `.env` when ready.
 5. **Chat-Bot Token (for managing channels via chat)**:
    - Open Telegram and message [@BotFather](https://t.me/BotFather).
    - Send `/newbot`, follow the prompts to choose a name and username.
@@ -90,7 +91,6 @@ Copy `.env.example` to `.env` and Fill in your keys in `.env`:
 ```
 API_ID=your_telegram_api_id
 API_HASH=your_telegram_api_hash
-PHONE_NUMBER=+251912345678
 GEMINI_API_KEY=your_gemini_api_key
 BOT_TOKEN=your_botfather_bot_token
 ALLOWED_USER_ID=your_numeric_telegram_user_id
@@ -103,6 +103,7 @@ node index.js
 ```
 
 - **First Run**: The console will prompt you for the Telegram verification code sent to your phone/Telegram app.
+- The phone number is entered interactively during first login; it does not need to be stored in `.env`.
 - Once authenticated, your session is saved to `.session` (gitignored).
 - **Subsequent Runs**: Connects instantly without asking for codes!
 

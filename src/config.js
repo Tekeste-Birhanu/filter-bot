@@ -50,11 +50,6 @@ function loadAndValidateConfig() {
     }
   }
 
-  // Validate GEMINI_API_KEY
-  if (!geminiApiKey) {
-    errors.push("GEMINI_API_KEY is required (obtain from https://aistudio.google.com/app/apikey).");
-  }
-
   if (errors.length > 0) {
     console.error("\n❌ Configuration Error: Missing or invalid environment variables:");
     for (const error of errors) {
@@ -68,14 +63,13 @@ function loadAndValidateConfig() {
     telegram: {
       apiId,
       apiHash,
-      phoneNumber: process.env.PHONE_NUMBER?.trim() || "",
       sessionString: process.env.SESSION_STRING?.trim() || "",
       sessionFilePath: path.resolve(process.cwd(), process.env.SESSION_FILE_PATH?.trim() || ".session"),
       botToken,
       allowedUserId,
     },
     gemini: {
-      apiKey: geminiApiKey,
+      apiKey: geminiApiKey || "",
       model: process.env.GEMINI_MODEL?.trim() || "gemini-2.5-flash",
     },
     storage: {
